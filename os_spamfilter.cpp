@@ -7,6 +7,7 @@
 ** Author : skutte (SkyChatz1234@gmail.com)
 ** Release : 5th May, 2023
 ** Update : -
+** Github : https://github.com/SkyChatz/anope-modules
 ************************************************************************************************
 ** <Description>
 **
@@ -110,7 +111,7 @@ public:
 		fprintf(f, "};\n");
 		fclose(f);
 		UplinkSocket::Message() << "REHASH -global";
-
+		Log(LOG_ADMIN, source, this) << "to add [ " << match << " ] into spamfilter.conf ";
 		u->SendMessage(Config->GetClient("OperServ"), "spamfilter adding the following URL: %s.", match.c_str());
 	}
 	else
