@@ -49,7 +49,7 @@ class CommandBSRps : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource& source, const std::vector<Anope::string>& params) Anope_override
+	void Execute(CommandSource& source, const std::vector<Anope::string>& params) anope_override
 	{
 		std::vector<Anope::string> responses;
 		responses.reserve(25);
@@ -123,7 +123,7 @@ class CommandBSRps : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource& source, const Anope::string& subcommand) Anope_override
+	bool OnHelp(CommandSource& source, const Anope::string& subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
