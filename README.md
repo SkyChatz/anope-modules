@@ -7,8 +7,9 @@ These are additional modules for Anope. The modules are currently being used on 
 [Installing]
 
 Place the cpp file inside /modules/third/
-cd $anope_source_dir$
+cd anope-2.0.*
 ./Config
+cd build
 make
 make install
 Add the module enabling code to your modules.conf
