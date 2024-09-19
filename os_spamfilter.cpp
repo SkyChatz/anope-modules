@@ -1,5 +1,5 @@
 #include "module.h"
-#define VER "1.0.0"
+#define VER "1.0.1"
 /**
 ************************************************************************************************
 ** Module : os_spamfilter.cpp
@@ -69,21 +69,21 @@ public:
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
-		if (!matchtype.equals_ci("simple") && !matchtype.equals_ci("regex"))
+		if (!matchtype.equals_ci("simple") || !matchtype.equals_ci("regex"))
 		{
 			source.Reply(_("Please choices \002simple\002 or \002regex\002"));
 		    return;
 		}
-		if (!target.equals_ci("channel") && !target.equals_ci("private") && !target.equals_ci("private-notice") && !target.equals_ci("channel-notice")
-		 && !target.equals_ci("part") && !target.equals_ci("quit") && !target.equals_ci("dcc") && !target.equals_ci("away")
-		 && !target.equals_ci("topic") && !target.equals_ci("message-tag") && !target.equals_ci("user") && !target.equals_ci("default"))
+		if (!target.equals_ci("channel") || !target.equals_ci("private") || !target.equals_ci("private-notice") || !target.equals_ci("channel-notice")
+		 || !target.equals_ci("part") || !target.equals_ci("quit") || !target.equals_ci("dcc") || !target.equals_ci("away")
+		 || !target.equals_ci("topic") || !target.equals_ci("message-tag") || !target.equals_ci("user") || !target.equals_ci("default"))
 		{
 			source.Reply(_("\002Target\002 [ channel | private | private-notice | channel-notice | part | quit | dcc | away | topic | message-tag | user ]"));
 			return;
 		}
-		if (!action.equals_ci("Tempshun") && !action.equals_ci("shun") && !action.equals_ci("kline") && !action.equals_ci("gline")
-		 && !action.equals_ci("zline") && !action.equals_ci("gzline") && !action.equals_ci("kill") && !action.equals_ci("block")
-		 && !action.equals_ci("dccblock") && !action.equals_ci("viruschan") && !action.equals_ci("warn"))
+		if (!action.equals_ci("Tempshun") || !action.equals_ci("shun") || !action.equals_ci("kline") || !action.equals_ci("gline")
+		 || !action.equals_ci("zline") || !action.equals_ci("gzline") || !action.equals_ci("kill") || !action.equals_ci("block")
+		 || !action.equals_ci("dccblock") || !action.equals_ci("viruschan") || !action.equals_ci("warn"))
 		{
 			source.Reply(_("\002Action\002 [ Kill | Tempshun | shun | kline | gline | zline | gzline | block | dccblock | viruschan | warn ]"));
 			return;
@@ -121,15 +121,15 @@ public:
 	{ 
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply("Spamfilter allows you to put spamfilter into Unrealircd spamfilter config block,\n"
+		source.Reply("Spamfilter allows you to put spamfilter into Unrealircd spamfilter config block, "
 					 "automatically rehash the server");
 		source.Reply(" ");
 		source.Reply("The command requires all 4 parameters.\n"
-			     "\037Match-Type\037 is type of match string you're going to use Simple or Regex\n"
-			     "\037Target\037 is the targets this spamfilter will look into like Private or Channel\n"
-			     "\037Action\037 is specifies the action to be taken, such as kline.\n"
-			     "\037Match\037 is the actual string that should be blocked or should perform \n"
-				 "the specified action on, this can be (wildcard)");
+			     "\037Match-Type\037 - type of match string you're going to use Simple or Regex\n"
+			     "\037Target\037 - the targets this spamfilter will look into like Private or Channel\n"
+			     "\037Action\037 - specifies the action to be taken, such as kline.\n"
+			     "\037Match\037 - the actual string that should be blocked or should perform  "
+				 "the specified action on, this can be (wildcard) \n");
 		return true;
 	}
 };
