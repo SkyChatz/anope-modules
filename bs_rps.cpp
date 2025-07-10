@@ -48,12 +48,12 @@ struct RPSGameState {
     int bot_wins;
 };
 
-class CommandGSRps : public Command
+class CommandBSRps : public Command
 {
     std::map<std::string, RPSGameState> games; 
 
  public:
-    CommandGSRps(Module* creator, const Anope::string& sname = "gameserv/rps") : Command(creator, sname, 1, 3)
+    CommandBSRps(Module* creator, const Anope::string& sname = "gameserv/rps") : Command(creator, sname, 1, 3)
     {
         this->SetDesc(_("Perform a Rock paper scissors Games"));
         this->SetSyntax("\037#channel\037 \037Action\037 [rounds]");
@@ -81,7 +81,6 @@ class CommandGSRps : public Command
     if (total_rounds < 1) total_rounds = 1;
 
     ChannelInfo* ci = ChannelInfo::Find(chan);
-    BotInfo *gs = Config->GetClient("GameServ");
 
     if (!ci)
     {
@@ -96,11 +95,6 @@ class CommandGSRps : public Command
     if (!ci->c || !ci->c->FindUser(ci->bi))
     {
         source.Reply(BOT_NOT_ON_CHANNEL, ci->name.c_str());
-        return;
-    }
-    if (!gs)
-    {
-        source.Reply("GameServ client not found");
         return;
     }
 
@@ -122,7 +116,7 @@ class CommandGSRps : public Command
         state.user_wins = 0;
         state.bot_wins = 0;
         games[key] = state;
-        IRCD->SendPrivmsg(gs, ci->name, "%s: The Rock-Paper-Scissors game will begin now! Type ROCK, PAPER, or SCISSORS to play.", source.GetNick().c_str());
+        IRCD->SendPrivmsg(*ci->bi, ci->name, "%s: The Rock-Paper-Scissors game will begin now! Type ROCK, PAPER, or SCISSORS to play.", source.GetNick().c_str());
         return;
     }
 
@@ -151,18 +145,18 @@ class CommandGSRps : public Command
         (user_move.equals_ci("SCISSORS") && text.equals_ci("PAPER")))
     {
         state.user_wins++;
-        IRCD->SendPrivmsg(gs, ci->name, "You Win this round! %s vs %s.", user_move.c_str(), text.c_str());
+        IRCD->SendPrivmsg(*ci->bi, ci->name, "You Win this round! %s vs %s.", user_move.c_str(), text.c_str());
     }
     else if ((user_move.equals_ci("ROCK") && text.equals_ci("PAPER")) ||
              (user_move.equals_ci("PAPER") && text.equals_ci("SCISSORS")) ||
              (user_move.equals_ci("SCISSORS") && text.equals_ci("ROCK")))
     {
         state.bot_wins++;
-        IRCD->SendPrivmsg(gs, ci->name, "Bot Wins this round! %s vs %s.", text.c_str(), user_move.c_str());
+        IRCD->SendPrivmsg(*ci->bi, ci->name, "Bot Wins this round! %s vs %s.", text.c_str(), user_move.c_str());
     }
     else
     {
-        IRCD->SendPrivmsg(gs, ci->name, "Tie this round! Both chose %s.", user_move.c_str());
+        IRCD->SendPrivmsg(*ci->bi, ci->name, "Tie this round! Both chose %s.", user_move.c_str());
     }
 
     state.played++;
@@ -172,24 +166,24 @@ class CommandGSRps : public Command
         // Game over, announce winner and kick if user lost
         if (state.user_wins > state.bot_wins)
         {
-            IRCD->SendPrivmsg(gs, ci->name, "%s wins the game! (%d:%d)", source.GetNick().c_str(), state.user_wins, state.bot_wins);
+            IRCD->SendPrivmsg(*ci->bi, ci->name, "%s wins the game! (%d:%d)", source.GetNick().c_str(), state.user_wins, state.bot_wins);
         }
         else if (state.user_wins < state.bot_wins)
         {
-            IRCD->SendPrivmsg(gs, ci->name, "Bot wins the game! (%d:%d) %s will be kicked.", state.bot_wins, state.user_wins, source.GetNick().c_str());
+            IRCD->SendPrivmsg(*ci->bi, ci->name, "Bot wins the game! (%d:%d) %s will be kicked.", state.bot_wins, state.user_wins, source.GetNick().c_str());
             User *u = User::Find(source.GetNick().c_str());
             if (u)
                 ci->c->Kick(ci->bi, u, "You lost the RPS game!");
         }
         else
         {
-            IRCD->SendPrivmsg(gs, ci->name, "The game is a tie! (%d:%d)", state.user_wins, state.bot_wins);
+            IRCD->SendPrivmsg(*ci->bi, ci->name, "The game is a tie! (%d:%d)", state.user_wins, state.bot_wins);
         }
         games.erase(key);
     }
     else
     {
-        IRCD->SendPrivmsg(gs, ci->name, "Round %d/%d complete. Score: You %d - Bot %d", state.played, state.rounds, state.user_wins, state.bot_wins);
+        IRCD->SendPrivmsg(*ci->bi, ci->name, "Round %d/%d complete. Score: You %d - Bot %d", state.played, state.rounds, state.user_wins, state.bot_wins);
     }
 }
 
@@ -208,19 +202,19 @@ class CommandGSRps : public Command
     }
 };
 
-class GSRps : public Module
+class BSRps : public Module
 {
-	CommandGSRps commandgsrps;
+	CommandBSRps commandbsrps;
 
  public:
-	GSRps(const Anope::string& modname, const Anope::string& creator) : Module(modname, creator, THIRD),
-		commandgsrps(this)
+	BSRps(const Anope::string& modname, const Anope::string& creator) : Module(modname, creator, THIRD),
+		commandbsrps(this)
 	{
-		if (!ModuleManager::FindModule("gameserv"))
+		if(Anope::VersionMajor() < 2)
 		{
-			throw ModuleException("This module requires the GameServ core module to be loaded in order to function.");
+			throw ModuleException("Requires version 2.x.x of Anope.");
 		}
 	}
 };
 
-MODULE_INIT(GSRps)
+MODULE_INIT(BSRps)
